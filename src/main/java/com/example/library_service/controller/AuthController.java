@@ -1,14 +1,12 @@
 package com.example.library_service.controller;
 
-import com.example.library_service.dto.LibraryAuthResponse;
-import com.example.library_service.dto.LibraryLoginRequest;
-import com.example.library_service.dto.LibraryRegisterRequest;
-import com.example.library_service.dto.LibraryUserResponse;
+import com.example.library_service.dto.*;
 import com.example.library_service.entity.LibraryUser;
 import com.example.library_service.security.CustomLibraryUserDetails;
 import com.example.library_service.security.JwtService;
 import com.example.library_service.service.LibraryUserService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,5 +36,11 @@ public class AuthController {
                 user.getRole(),
                 user.isFirstLogin()
         );
+    }
+
+    @PostMapping("/change-pin")
+    public ResponseEntity<String> changePin(@Valid @RequestBody ChangePinRequest request) {
+        libraryUserService.changePin(request);
+        return ResponseEntity.ok("PIN changed successfully");
     }
 }

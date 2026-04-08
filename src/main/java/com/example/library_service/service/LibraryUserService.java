@@ -1,5 +1,6 @@
 package com.example.library_service.service;
 
+import com.example.library_service.dto.ChangePinRequest;
 import com.example.library_service.entity.LibraryUser;
 import com.example.library_service.entity.LibraryRole;
 import com.example.library_service.exception.InvalidCredentialsException;
@@ -16,11 +17,13 @@ public class LibraryUserService {
 
     private final LibraryUserRepository libraryUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticatedLibraryUserService authenticatedLibraryUserService;
 
     public LibraryUserService(LibraryUserRepository libraryUserRepository,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder, AuthenticatedLibraryUserService authenticatedLibraryUserService) {
         this.libraryUserRepository = libraryUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticatedLibraryUserService = authenticatedLibraryUserService;
     }
 
     public LibraryUser createStudentLibraryAccount(String studentId) {
@@ -56,5 +59,17 @@ public class LibraryUserService {
         }
 
         return user;
+    }
+
+    public void changePin(ChangePinRequest request) {
+        LibraryUser user = authenticatedLibraryUserService.getCurrentUser();
+
+        if (!passwordEncoder.matches(request.getOldPin(), user.getPinHash())) {
+            throw new InvalidCredentialsException("Old PIN is incorrect");
+        }
+
+        user.setPinHash(passwordEncoder.encode(request.getNewPin()));
+        user.setFirstLogin(false);
+        libraryUserRepository.save(user);
     }
 }
