@@ -14,6 +14,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // Borrowing history of a student
     List<Loan> findByLibraryUser(LibraryUser libraryUser);
 
+    List<Loan> findByLibraryUserOrderByBorrowedAtDesc(LibraryUser libraryUser);
+
     // Current active loans
     List<Loan> findByStatus(LoanStatus status);
 
