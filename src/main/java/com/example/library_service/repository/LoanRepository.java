@@ -7,6 +7,7 @@ import com.example.library_service.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
@@ -30,4 +31,6 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
     // Count loans by user and status (useful for admin view)
     long countByLibraryUserAndStatus(LibraryUser libraryUser, LoanStatus status);
+
+    Optional<Loan> findByLibraryUserAndBookAndStatus(LibraryUser libraryUser, Book book, LoanStatus status);
 }
