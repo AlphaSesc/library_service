@@ -54,10 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/library/auth/**",
                                 "/login",
                                 "/dashboard",
-                                "/books")
+                                "/books",
+                                "/admin/dashboard")
                         .permitAll()
                         .requestMatchers("/api/library/register").permitAll()
-                        .requestMatchers("/api/library/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

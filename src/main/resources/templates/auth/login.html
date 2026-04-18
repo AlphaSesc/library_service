@@ -18,7 +18,7 @@
 
                     <form id="loginForm">
                         <div class="mb-3">
-                            <label for="studentId" class="form-label">Student ID</label>
+                            <label for="studentId" class="form-label">Student ID or ADMIN ID</label>
                             <input type="text" class="form-control" id="studentId" required>
                         </div>
 
@@ -87,7 +87,11 @@
                 localStorage.setItem("role", result.role);
                 localStorage.setItem("firstLogin", result.firstLogin);
 
-                window.location.href = [[ @{/dashboard} ]];
+                if (result.role == "ADMIN") {
+                    window.location.href = [[ @{/admin/dashboard} ]];
+                } else {
+                    window.location.href = [[ @{/dashboard} ]];
+                }
 
             } catch (error) {
                     messageBox.innerHTML = `
