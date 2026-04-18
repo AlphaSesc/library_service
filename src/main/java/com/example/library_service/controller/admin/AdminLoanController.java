@@ -1,4 +1,4 @@
-package com.example.library_service.controller;
+package com.example.library_service.controller.admin;
 
 import com.example.library_service.dto.LoanHistoryResponse;
 import com.example.library_service.dto.StudentLoanSummaryResponse;

@@ -1,4 +1,4 @@
-package com.example.library_service.controller;
+package com.example.library_service.controller.admin;
 
 import com.example.library_service.dto.AddBookRequest;
 import com.example.library_service.dto.BookResponse;
@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/api/admin/library/books")
 @RequiredArgsConstructor
-public class BookController {
+public class AdminBookController {
 
     private final BookService bookService;
 
     @GetMapping
-    public List<BookResponse> getAllBooks() {
+    public List<BookResponse> getAllBooksForAdmin() {
         return bookService.getAllBooks();
     }
 

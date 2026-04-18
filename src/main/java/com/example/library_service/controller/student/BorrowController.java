@@ -1,4 +1,4 @@
-package com.example.library_service.controller;
+package com.example.library_service.controller.student;
 
 import com.example.library_service.dto.BorrowRequest;
 import com.example.library_service.dto.BorrowResponse;
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/borrow")
+@RequestMapping("/api/library/borrow")
 @RequiredArgsConstructor
 public class BorrowController {
 

@@ -53,7 +53,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/library/auth/**",
                                 "/login",
-                                "/dashboard")
+                                "/dashboard",
+                                "/books")
                         .permitAll()
                         .requestMatchers("/api/library/register").permitAll()
                         .requestMatchers("/api/library/admin/**").hasRole("ADMIN")

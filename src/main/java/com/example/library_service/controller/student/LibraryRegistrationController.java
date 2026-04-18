@@ -1,4 +1,4 @@
-package com.example.library_service.controller;
+package com.example.library_service.controller.student;
 
 import com.example.library_service.dto.LibraryRegisterRequest;
 import com.example.library_service.dto.LibraryUserResponse;

@@ -21,4 +21,7 @@ public class WebPageController {
         return "student/dashboard";
     }
 
+    @GetMapping("/books")
+    public String booksPage()
+    { return "student/books";}
 }
