@@ -55,6 +55,8 @@ public class SecurityConfig {
                                 "/login",
                                 "/dashboard",
                                 "/books",
+                                "/borrow-history",
+                                "/my-borrowings",
                                 "/admin/dashboard",
                                 "/admin/add-book",
                                 "/admin/books",

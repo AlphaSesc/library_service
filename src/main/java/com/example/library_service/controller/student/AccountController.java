@@ -10,11 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/api/library/account")
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
+
+    @GetMapping("/my-borrowings")
+    public List<LoanHistoryResponse> getMyBorrowings() {
+        return accountService.getMyBorrowings();
+    }
 
     @GetMapping("/me")
     public List<LoanHistoryResponse> getMyBorrowingHistory() {

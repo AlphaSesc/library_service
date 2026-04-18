@@ -25,6 +25,16 @@ public class WebPageController {
     public String booksPage()
     { return "student/books";}
 
+    @GetMapping("/borrow-history")
+    public String borrowHistoryPage() {
+        return "student/borrow-history";
+    }
+
+    @GetMapping("/my-borrowings")
+    public String myBorrowingsPage() {
+        return "student/my-borrowings";
+    }
+
     @GetMapping("/admin/dashboard")
     public String adminDashboardPage() {
         return "admin/dashboard";
