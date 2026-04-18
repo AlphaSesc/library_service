@@ -34,4 +34,14 @@ public class WebPageController {
     public String addBookPage() {
         return "admin/add-book";
     }
+
+    @GetMapping("/admin/books")
+    public String adminBooksPage() {
+        return "admin/books";
+    }
+
+    @GetMapping("/admin/current-loans")
+    public String currentLoansPage() {
+        return "admin/current-loans";
+    }
 }

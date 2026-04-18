@@ -56,7 +56,9 @@ public class SecurityConfig {
                                 "/dashboard",
                                 "/books",
                                 "/admin/dashboard",
-                                "/admin/add-book")
+                                "/admin/add-book",
+                                "/admin/books",
+                                "/admin/current-loans")
                         .permitAll()
                         .requestMatchers("/api/library/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
