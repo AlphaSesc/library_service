@@ -44,4 +44,9 @@ public class WebPageController {
     public String currentLoansPage() {
         return "admin/current-loans";
     }
+
+    @GetMapping("/admin/overdue")
+    public String overduePage() {
+        return "admin/overdue";
+    }
 }

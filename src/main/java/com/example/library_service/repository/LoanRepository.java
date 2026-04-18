@@ -36,5 +36,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // Count loans by user and status (useful for admin view)
     long countByLibraryUserAndStatus(LibraryUser libraryUser, LoanStatus status);
 
+    long countByLibraryUserAndStatusIn(LibraryUser libraryUser, List<LoanStatus> statuses);
+
     Optional<Loan> findByLibraryUserAndBookAndStatus(LibraryUser libraryUser, Book book, LoanStatus status);
 }

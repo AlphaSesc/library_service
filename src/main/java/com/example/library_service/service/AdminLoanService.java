@@ -45,7 +45,7 @@ public class AdminLoanService {
                 .stream()
                 .map(user -> StudentLoanSummaryResponse.builder()
                         .studentId(user.getStudentId())
-                        .booksOnLoan(loanRepository.countByLibraryUserAndStatus(user, LoanStatus.BORROWED))
+                        .booksOnLoan(loanRepository.countByLibraryUserAndStatusIn(user, List.of(LoanStatus.BORROWED, LoanStatus.OVERDUE)))
                         .overdueBooks(loanRepository.countByLibraryUserAndStatus(user, LoanStatus.OVERDUE))
                         .build())
                 .toList();
