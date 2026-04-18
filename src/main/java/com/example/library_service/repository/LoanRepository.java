@@ -1,11 +1,11 @@
 package com.example.library_service.repository;
 
 import com.example.library_service.entity.Loan;
-import com.example.library_service.entity.LoanStatus;
 import com.example.library_service.entity.LibraryUser;
 import com.example.library_service.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,27 +16,16 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
     List<Loan> findByLibraryUserOrderByBorrowedAtDesc(LibraryUser libraryUser);
 
-    // Current active loans
-    List<Loan> findByStatus(LoanStatus status);
+    Optional<Loan> findByLibraryUserAndBookAndReturnedAtIsNull(LibraryUser libraryUser, Book book);
 
-    List<Loan> findByStatusOrderByBorrowedAtDesc(LoanStatus status);
+    List<Loan> findByReturnedAtIsNullOrderByBorrowedAtDesc();
 
-    // Loans by status for a specific user
-    List<Loan> findByLibraryUserAndStatus(LibraryUser libraryUser, LoanStatus status);
+    long countByLibraryUserAndReturnedAtIsNull(LibraryUser libraryUser);
 
-    // Loans for a specific book
-    List<Loan> findByBook(Book book);
+    long countByLibraryUserAndReturnedAtIsNullAndDueAtBefore(
+            LibraryUser libraryUser,
+            LocalDateTime time
+    );
 
-    // Active loans (not returned)
-    List<Loan> findByActiveTrue();
-
-    // Overdue loans
-    List<Loan> findByStatus(LoanStatus status, boolean active);
-
-    // Count loans by user and status (useful for admin view)
-    long countByLibraryUserAndStatus(LibraryUser libraryUser, LoanStatus status);
-
-    long countByLibraryUserAndStatusIn(LibraryUser libraryUser, List<LoanStatus> statuses);
-
-    Optional<Loan> findByLibraryUserAndBookAndStatus(LibraryUser libraryUser, Book book, LoanStatus status);
+    List<Loan> findByReturnedAtIsNullAndDueAtBeforeOrderByBorrowedAtDesc(LocalDateTime time);
 }

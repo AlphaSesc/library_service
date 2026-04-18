@@ -12,6 +12,7 @@ import com.example.library_service.exception.ResourceAlreadyExistsException;
 import com.example.library_service.exception.ResourceNotFoundException;
 import com.example.library_service.repository.BookRepository;
 import com.example.library_service.repository.LoanRepository;
+import com.example.library_service.util.LoanStatusResolver;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class BorrowService {
             throw new NoAvailableCopiesException("No available copies for this book");
         }
 
-        loanRepository.findByLibraryUserAndBookAndStatus(libraryUser, book, LoanStatus.BORROWED)
+        loanRepository.findByLibraryUserAndBookAndReturnedAtIsNull(libraryUser, book)
                 .ifPresent(loan -> {
                     throw new ResourceAlreadyExistsException("You have already borrowed this book");
                 });
@@ -51,7 +52,6 @@ public class BorrowService {
         Loan loan = Loan.builder()
                 .libraryUser(libraryUser)
                 .book(book)
-                .status(LoanStatus.BORROWED)
                 .build();
 
         Loan savedLoan = loanRepository.save(loan);
@@ -64,7 +64,7 @@ public class BorrowService {
                 .studentId(libraryUser.getStudentId())
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
-                .status(savedLoan.getStatus())
+                .status(LoanStatusResolver.resolve(savedLoan))
                 .borrowedAt(savedLoan.getBorrowedAt())
                 .dueAt(savedLoan.getDueAt())
                 .build();

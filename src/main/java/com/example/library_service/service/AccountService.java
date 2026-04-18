@@ -3,6 +3,7 @@ package com.example.library_service.service;
 import com.example.library_service.dto.LoanHistoryResponse;
 import com.example.library_service.entity.LibraryUser;
 import com.example.library_service.repository.LoanRepository;
+import com.example.library_service.util.LoanStatusResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class AccountService {
                         .isbn(loan.getBook().getIsbn())
                         .title(loan.getBook().getTitle())
                         .author(loan.getBook().getAuthor())
-                        .status(loan.getStatus())
+                        .status(LoanStatusResolver.resolve(loan))
                         .borrowedAt(loan.getBorrowedAt())
                         .dueAt(loan.getDueAt())
                         .returnedAt(loan.getReturnedAt())

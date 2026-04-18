@@ -13,12 +13,14 @@ import com.example.library_service.exception.InactiveUserException;
 import com.example.library_service.exception.ResourceNotFoundException;
 import com.example.library_service.repository.BookRepository;
 import com.example.library_service.repository.LoanRepository;
+import com.example.library_service.util.LoanStatusResolver;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,14 +42,15 @@ public class ReturnService {
         Book book = bookRepository.findByIsbn(request.getIsbn())
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
-        Loan loan = loanRepository.findByLibraryUserAndBookAndStatus(libraryUser, book, LoanStatus.BORROWED)
-                .orElseThrow(() -> new ResourceNotFoundException("Active loan not found for this book"));
+        Loan loan = loanRepository.findByLibraryUserAndBookAndReturnedAtIsNull(
+                libraryUser,
+                book
+        ).orElseThrow(() -> new ResourceNotFoundException("Active loan not found for this book"));
 
         LocalDateTime returnedAt = LocalDateTime.now();
         boolean returnedLate = returnedAt.isAfter(loan.getDueAt());
 
-        loan.setStatus(LoanStatus.RETURNED);
-        loan.setReturnedAt(LocalDateTime.now());
+        loan.setReturnedAt(returnedAt);
 
         Loan savedLoan = loanRepository.save(loan);
 
@@ -70,7 +73,7 @@ public class ReturnService {
                 .studentId(libraryUser.getStudentId())
                 .isbn(book.getIsbn())
                 .title(book.getTitle())
-                .status(savedLoan.getStatus())
+                .status(LoanStatusResolver.resolve(savedLoan))
                 .borrowedAt(savedLoan.getBorrowedAt())
                 .dueAt(savedLoan.getDueAt())
                 .returnedAt(savedLoan.getReturnedAt())

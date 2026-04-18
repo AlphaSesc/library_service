@@ -7,9 +7,11 @@ import com.example.library_service.entity.LibraryUser;
 import com.example.library_service.entity.LoanStatus;
 import com.example.library_service.repository.LibraryUserRepository;
 import com.example.library_service.repository.LoanRepository;
+import com.example.library_service.util.LoanStatusResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,7 +25,7 @@ public class AdminLoanService {
     public List<LoanHistoryResponse> getCurrentLoans() {
         authenticatedLibraryUserService.getCurrentAdminUser();
 
-        return loanRepository.findByStatusOrderByBorrowedAtDesc(LoanStatus.BORROWED)
+        return loanRepository.findByReturnedAtIsNullOrderByBorrowedAtDesc()
                 .stream()
                 .map(this::mapToLoanHistoryResponse)
                 .toList();
@@ -32,7 +34,7 @@ public class AdminLoanService {
     public List<LoanHistoryResponse> getOverdueLoans() {
         authenticatedLibraryUserService.getCurrentAdminUser();
 
-        return loanRepository.findByStatusOrderByBorrowedAtDesc(LoanStatus.OVERDUE)
+        return loanRepository.findByReturnedAtIsNullAndDueAtBeforeOrderByBorrowedAtDesc(LocalDateTime.now())
                 .stream()
                 .map(this::mapToLoanHistoryResponse)
                 .toList();
@@ -45,8 +47,15 @@ public class AdminLoanService {
                 .stream()
                 .map(user -> StudentLoanSummaryResponse.builder()
                         .studentId(user.getStudentId())
-                        .booksOnLoan(loanRepository.countByLibraryUserAndStatusIn(user, List.of(LoanStatus.BORROWED, LoanStatus.OVERDUE)))
-                        .overdueBooks(loanRepository.countByLibraryUserAndStatus(user, LoanStatus.OVERDUE))
+                        .booksOnLoan(
+                                loanRepository.countByLibraryUserAndReturnedAtIsNull(user)
+                        )
+                        .overdueBooks(
+                                loanRepository.countByLibraryUserAndReturnedAtIsNullAndDueAtBefore(
+                                        user,
+                                        LocalDateTime.now()
+                                )
+                        )
                         .build())
                 .toList();
     }
@@ -58,7 +67,7 @@ public class AdminLoanService {
                 .isbn(loan.getBook().getIsbn())
                 .title(loan.getBook().getTitle())
                 .author(loan.getBook().getAuthor())
-                .status(loan.getStatus())
+                .status(LoanStatusResolver.resolve(loan))
                 .borrowedAt(loan.getBorrowedAt())
                 .dueAt(loan.getDueAt())
                 .returnedAt(loan.getReturnedAt())

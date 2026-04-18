@@ -26,10 +26,6 @@ public class Loan {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LoanStatus status;
-
     @Column(nullable = false)
     private LocalDateTime borrowedAt;
 
@@ -52,10 +48,6 @@ public class Loan {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.active = true;
-
-        if (this.status == null) {
-            this.status = LoanStatus.BORROWED;
-        }
 
         if (this.borrowedAt == null) {
             this.borrowedAt = LocalDateTime.now();

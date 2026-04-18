@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/returns")
+@RequestMapping("/api/library/returns")
 @RequiredArgsConstructor
 public class ReturnController {
 
