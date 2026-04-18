@@ -48,6 +48,8 @@
 
 <script th:inline="javascript">
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
     const messageBox = document.getElementById("message");
     const booksBody = document.getElementById("booksBody");
     const booksTable = document.getElementById("booksTable");
@@ -57,129 +59,185 @@
         window.location.href = [[ @{/login} ]];
     }
 
-        async function loadBooks() {
-            messageBox.innerHTML = "";
+    if (role !== "STUDENT") {
+        window.location.href = [[ @{/admin/dashboard} ]];
+    }
 
-            try {
-                const response = await fetch([[ @{/api/library/books} ]], {
-                    method: "GET",
-                        headers: {
-                        "Authorization": "Bearer " + token
+    async function fetchMyBorrowedIsbns() {
+        const response = await fetch([[ @{/api/library/account/my-borrowings} ]], {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.clear();
+            window.location.href = [[ @{/login} ]];
+            return null;
+        }
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            let errorHtml = result.message
+                ? `<div>${result.message}</div>`
+                : `<div>Failed to load current borrowings.</div>`;
+
+            if (result.validationErrors) {
+                for (const field in result.validationErrors) {
+                    errorHtml += `<div>${result.validationErrors[field]}</div>`;
+                }
+            }
+
+            messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
+            return null;
+        }
+
+        return new Set(result.map(loan => loan.isbn));
+    }
+
+    async function loadBooks() {
+        messageBox.innerHTML = "";
+        loading.style.display = "block";
+        booksTable.style.display = "none";
+
+        try {
+            const borrowedIsbns = await fetchMyBorrowedIsbns();
+
+            if (borrowedIsbns === null) {
+                loading.style.display = "none";
+                return;
+            }
+
+            const response = await fetch([[ @{/api/library/books} ]], {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = [[ @{/login} ]];
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                let errorHtml = result.message
+                    ? `<div>${result.message}</div>`
+                    : `<div>Failed to load books.</div>`;
+
+                if (result.validationErrors) {
+                    for (const field in result.validationErrors) {
+                        errorHtml += `<div>${result.validationErrors[field]}</div>`;
                     }
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.clear();
-                    window.location.href = [[ @{/login} ]];
-                    return;
                 }
 
-                    const result = await response.json();
+                messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
+                loading.style.display = "none";
+                return;
+            }
 
-                    if (!response.ok) {
-                        let errorHtml = result.message
-                            ? `<div>${result.message}</div>`
-                            : `<div>Failed to load books.</div>`;
+            booksBody.innerHTML = "";
 
-                        if (result.validationErrors) {
-                            for (const field in result.validationErrors) {
-                                errorHtml += `<div>${result.validationErrors[field]}</div>`;
-                            }
-                        }
+            if (result.length === 0) {
+                booksBody.innerHTML = `<tr><td colspan="8" class="text-center">No books available</td></tr>`;
+            } else {
+                result.forEach(book => {
+                    const statusBadge = book.active
+                        ? `<span class="badge bg-success">Active</span>`
+                        : `<span class="badge bg-secondary">Inactive</span>`;
 
-                        messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
-                        loading.style.display = "none";
-                        return;
-                    }
+                    const availabilityBadge = book.availableCopies > 0
+                        ? `<span class="badge bg-success">${book.availableCopies}</span>`
+                        : `<span class="badge bg-danger">0</span>`;
 
-                    booksBody.innerHTML = "";
+                    const alreadyBorrowed = borrowedIsbns.has(book.isbn);
 
-                    if (result.length === 0) {
-                        booksBody.innerHTML = `<tr><td colspan="8" class="text-center">No books available</td></tr>`;
-                    } else {
-                        result.forEach(book => {
-                            const statusBadge = book.active
-                                ? `<span class="badge bg-success">Active</span>`
-                                : `<span class="badge bg-secondary">Inactive</span>`;
-
-                            const availabilityBadge = book.availableCopies > 0
-                                ? `<span class="badge bg-success">${book.availableCopies}</span>`
-                                : `<span class="badge bg-danger">0</span>`;
-
-                            const borrowDisabled = book.availableCopies === 0 || !book.active;
-                            const borrowButton = `
+                    let actionButton = `
                         <button
                             class="btn btn-primary btn-sm"
                             onclick="borrowBook('${book.isbn}')"
-                            ${borrowDisabled ? 'disabled' : ''}>
+                            ${(book.availableCopies === 0 || !book.active) ? 'disabled' : ''}>
                             Borrow
                         </button>
                     `;
 
-                            const row = `
+                    if (alreadyBorrowed) {
+                        actionButton = `
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                Borrowed
+                            </button>
+                        `;
+                    }
+
+                    const row = `
                         <tr>
-                            <td>${book.id}</td>
-                            <td>${book.isbn}</td>
-                            <td>${book.title}</td>
-                            <td>${book.author}</td>
-                            <td>${book.totalCopies}</td>
+                            <td>${book.id ?? ''}</td>
+                            <td>${book.isbn ?? ''}</td>
+                            <td>${book.title ?? ''}</td>
+                            <td>${book.author ?? ''}</td>
+                            <td>${book.totalCopies ?? ''}</td>
                             <td>${availabilityBadge}</td>
                             <td>${statusBadge}</td>
-                            <td>${borrowButton}</td>
+                            <td>${actionButton}</td>
                         </tr>
                     `;
 
-                            booksBody.innerHTML += row;
-                        });
-                    }
-
-                    loading.style.display = "none";
-                    booksTable.style.display = "table";
-
-                } catch (error) {
-                    messageBox.innerHTML =
-                        `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
-                    loading.style.display = "none";
-                }
+                    booksBody.innerHTML += row;
+                });
             }
 
-            async function borrowBook(isbn) {
-                messageBox.innerHTML = "";
+            loading.style.display = "none";
+            booksTable.style.display = "table";
 
-                try {
-                    const response = await fetch([[ @{/api/library/borrow} ]], {
-                        method: "POST",
-                            headers: {
-                            "Content-Type": "application/json",
-                                "Authorization": "Bearer " + token
-                        },
-                        body: JSON.stringify({ isbn: isbn })
-                    });
+        } catch (error) {
+            messageBox.innerHTML =
+                `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
+            loading.style.display = "none";
+        }
+    }
 
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.clear();
-                        window.location.href = [[ @{/login} ]];
-                        return;
+    async function borrowBook(isbn) {
+        messageBox.innerHTML = "";
+
+        try {
+            const response = await fetch([[ @{/api/library/borrow} ]], {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({ isbn: isbn })
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = [[ @{/login} ]];
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                let errorHtml = result.message
+                    ? `<div>${result.message}</div>`
+                    : `<div>Failed to borrow book.</div>`;
+
+                if (result.validationErrors) {
+                    for (const field in result.validationErrors) {
+                        errorHtml += `<div>${result.validationErrors[field]}</div>`;
                     }
+                }
 
-                        const result = await response.json();
+                messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
+                return;
+            }
 
-                        if (!response.ok) {
-                            let errorHtml = result.message
-                                ? `<div>${result.message}</div>`
-                                : `<div>Failed to borrow book.</div>`;
-
-                            if (result.validationErrors) {
-                                for (const field in result.validationErrors) {
-                                    errorHtml += `<div>${result.validationErrors[field]}</div>`;
-                                }
-                            }
-
-                            messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
-                            return;
-                        }
-
-                        messageBox.innerHTML = `
+            messageBox.innerHTML = `
                 <div class="alert alert-success">
                     <div><strong>Book borrowed successfully.</strong></div>
                     <div><strong>Loan ID:</strong> ${result.loanId}</div>
@@ -191,20 +249,20 @@
                 </div>
             `;
 
-                        await loadBooks();
+            await loadBooks();
 
-                    } catch (error) {
-                        messageBox.innerHTML =
-                            `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
-                    }
-                }
+        } catch (error) {
+            messageBox.innerHTML =
+                `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
+        }
+    }
 
-                function logout() {
-                    localStorage.clear();
-                    window.location.href = [[ @{/login} ]];
-                }
+    function logout() {
+        localStorage.clear();
+        window.location.href = [[ @{/login} ]];
+    }
 
-                    loadBooks();
+    loadBooks();
 </script>
 
 </body>
