@@ -6,8 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
+// Request DTO for registering a student in the library system
 public class LibraryRegisterRequest {
 
+    // Student ID received from Student Portal service
     @NotBlank(message = "Student ID is required")
     private String studentId;
 }

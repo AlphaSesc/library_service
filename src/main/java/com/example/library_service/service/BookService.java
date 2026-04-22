@@ -13,10 +13,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+// Service responsible for managing books and inventory in the library
 public class BookService {
 
     private final BookRepository bookRepository;
 
+    // Retrieves all active books and maps them to response DTOs
     public List<BookResponse> getAllBooks() {
         return bookRepository.findByActiveTrue()
                 .stream()
@@ -25,12 +27,16 @@ public class BookService {
     }
 
     @Transactional
+    // Adds a new book to the library after validating uniqueness of ISBN
     public BookResponse addBook(AddBookRequest request) {
+
+        // Prevent duplicate books with same ISBN
         bookRepository.findByIsbn(request.getIsbn())
                 .ifPresent(book -> {
                     throw new ResourceAlreadyExistsException("Book with this ISBN already exists");
                 });
 
+        // Create new book entity with initial inventory
         Book book = Book.builder()
                 .isbn(request.getIsbn())
                 .title(request.getTitle())
@@ -44,6 +50,7 @@ public class BookService {
         return mapToBookResponse(savedBook);
     }
 
+    // Maps Book entity to response DTO
     private BookResponse mapToBookResponse(Book book) {
         return BookResponse.builder()
                 .id(book.getId())

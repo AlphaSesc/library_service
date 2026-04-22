@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+// Response DTO representing library user details exposed to clients
 public class LibraryUserResponse {
     private Long id;
     private String studentId;

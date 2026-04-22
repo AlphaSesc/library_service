@@ -3,8 +3,6 @@ package com.example.library_service.service;
 import com.example.library_service.dto.LoanHistoryResponse;
 import com.example.library_service.dto.StudentLoanSummaryResponse;
 import com.example.library_service.entity.LibraryRole;
-import com.example.library_service.entity.LibraryUser;
-import com.example.library_service.entity.LoanStatus;
 import com.example.library_service.repository.LibraryUserRepository;
 import com.example.library_service.repository.LoanRepository;
 import com.example.library_service.util.LoanStatusResolver;
@@ -16,12 +14,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+// Service providing admin-level access to loan monitoring and summary information
 public class AdminLoanService {
 
     private final LoanRepository loanRepository;
     private final LibraryUserRepository libraryUserRepository;
     private final AuthenticatedLibraryUserService authenticatedLibraryUserService;
 
+    // Retrieves all currently active loans in the system
     public List<LoanHistoryResponse> getCurrentLoans() {
         authenticatedLibraryUserService.getCurrentAdminUser();
 
@@ -31,6 +31,7 @@ public class AdminLoanService {
                 .toList();
     }
 
+    // Retrieves all overdue active loans in the system
     public List<LoanHistoryResponse> getOverdueLoans() {
         authenticatedLibraryUserService.getCurrentAdminUser();
 
@@ -40,6 +41,7 @@ public class AdminLoanService {
                 .toList();
     }
 
+    // Provides per-student summary of active and overdue loans for admin monitoring
     public List<StudentLoanSummaryResponse> getStudentLoanSummaries() {
         authenticatedLibraryUserService.getCurrentAdminUser();
 
@@ -60,6 +62,7 @@ public class AdminLoanService {
                 .toList();
     }
 
+    // Maps Loan entity to admin-facing loan history response
     private LoanHistoryResponse mapToLoanHistoryResponse(com.example.library_service.entity.Loan loan) {
         return LoanHistoryResponse.builder()
                 .loanId(loan.getId())

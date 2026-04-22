@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/library/auth")
+// Controller handling authentication and credential management for library users
 public class AuthController {
 
     private final LibraryUserService libraryUserService;
@@ -21,6 +22,7 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    // Authenticates user using studentId and PIN, then returns JWT token
     @PostMapping("/login")
     public LibraryAuthResponse login(@Valid @RequestBody LibraryLoginRequest request) {
         LibraryUser user = libraryUserService.authenticate(
@@ -28,6 +30,7 @@ public class AuthController {
                 request.getPin()
         );
 
+        // Generate JWT token for authenticated user
         String token = jwtService.generateToken(new CustomLibraryUserDetails(user));
 
         return new LibraryAuthResponse(
@@ -38,6 +41,7 @@ public class AuthController {
         );
     }
 
+    // Allows authenticated user to change their PIN
     @PostMapping("/change-pin")
     public ResponseEntity<String> changePin(@Valid @RequestBody ChangePinRequest request) {
         libraryUserService.changePin(request);

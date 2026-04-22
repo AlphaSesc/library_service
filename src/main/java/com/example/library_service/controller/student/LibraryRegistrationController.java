@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+// Controller handling registration of students into the library system
 public class LibraryRegistrationController {
 
     private final LibraryUserService libraryUserService;
@@ -17,10 +18,12 @@ public class LibraryRegistrationController {
         this.libraryUserService = libraryUserService;
     }
 
+    // Registers a student as a library user using studentId from Student Portal
     @PostMapping("/register")
     public LibraryUserResponse register(@Valid @RequestBody LibraryRegisterRequest request) {
         LibraryUser savedUser = libraryUserService.createStudentLibraryAccount(request.getStudentId());
 
+        // Returns created library user details (excluding sensitive fields like PIN)
         return new LibraryUserResponse(
                 savedUser.getId(),
                 savedUser.getStudentId(),

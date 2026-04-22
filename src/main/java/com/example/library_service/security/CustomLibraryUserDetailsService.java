@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
+// Service used by Spring Security to load user details during authentication
 public class CustomLibraryUserDetailsService implements UserDetailsService {
 
     private final LibraryUserRepository libraryUserRepository;
@@ -17,6 +18,7 @@ public class CustomLibraryUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    // Fetches user by studentId and throws exception if not found
     public UserDetails loadUserByUsername(String studentId) {
         LibraryUser user = libraryUserRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid student ID or PIN"));

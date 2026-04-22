@@ -12,11 +12,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+// Service responsible for retrieving current and past borrowing records
 public class AccountService {
 
     private final LoanRepository loanRepository;
     private final AuthenticatedLibraryUserService authenticatedLibraryUserService;
 
+    // Retrieves currently active borrowings of the authenticated student
     public List<LoanHistoryResponse> getMyBorrowings() {
         LibraryUser libraryUser = authenticatedLibraryUserService.getCurrentStudentUser();
 
@@ -26,6 +28,7 @@ public class AccountService {
                 .toList();
     }
 
+    // Retrieves complete borrowing history of the authenticated student
     public List<LoanHistoryResponse> getMyBorrowingHistory() {
         LibraryUser libraryUser = authenticatedLibraryUserService.getCurrentStudentUser();
 
@@ -35,6 +38,7 @@ public class AccountService {
                 .toList();
     }
 
+    // Maps Loan entity to response DTO with dynamically resolved status
     private LoanHistoryResponse mapToLoanHistoryResponse(Loan loan, LibraryUser libraryUser) {
         return LoanHistoryResponse.builder()
                 .loanId(loan.getId())

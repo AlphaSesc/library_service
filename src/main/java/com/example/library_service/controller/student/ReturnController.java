@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/library/returns")
 @RequiredArgsConstructor
+// Controller handling book return operations for students
 public class ReturnController {
 
     private final ReturnService returnService;
 
     @PostMapping
+    // Allows authenticated student to return a borrowed book using ISBN
     public ReturnResponse returnBook(@Valid @RequestBody ReturnRequest request) {
         return returnService.returnBook(request);
     }

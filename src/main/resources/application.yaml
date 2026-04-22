@@ -1,13 +1,13 @@
 server:
-  port: 8082
+  port: 8082 # Library service runs on port 8082
 
 spring:
   application:
-    name: library_service
+    name: library_service  # Name used for identification (useful in microservices/logging)
 
   profiles:
-    active: dev
+    active: dev # Activates dev profile (loads application-dev.yaml)
 
 finance:
   service:
-    base-url: http://localhost:8080
+    base-url: http://localhost:8080 # URL of Finance microservice for inter-service communication

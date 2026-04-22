@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO representing complete loan history of a user
 public class LoanHistoryResponse {
 
     private Long loanId;

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO representing details of a book borrowing transaction
 public class BorrowResponse {
 
     private Long loanId;

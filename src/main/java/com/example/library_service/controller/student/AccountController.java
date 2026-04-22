@@ -12,15 +12,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/library/account")
 @RequiredArgsConstructor
+// Controller exposing student-specific endpoints for viewing borrowings
 public class AccountController {
 
     private final AccountService accountService;
 
+    // Returns currently active borrowings of the authenticated student
     @GetMapping("/my-borrowings")
     public List<LoanHistoryResponse> getMyBorrowings() {
         return accountService.getMyBorrowings();
     }
 
+    // Returns complete borrowing history (active + returned) of the authenticated student
     @GetMapping("/me")
     public List<LoanHistoryResponse> getMyBorrowingHistory() {
         return accountService.getMyBorrowingHistory();

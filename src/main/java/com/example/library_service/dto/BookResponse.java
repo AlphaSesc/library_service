@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO representing book details sent to clients
 public class BookResponse {
 
     private Long id;

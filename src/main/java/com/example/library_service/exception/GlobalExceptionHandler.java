@@ -14,9 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+// Centralized exception handler to provide consistent API error responses
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
+    // Handles custom business exceptions and returns their mapped HTTP status
     public ResponseEntity<ApiErrorResponse> handleBusinessException(
             BusinessException ex,
             HttpServletRequest request
@@ -36,12 +38,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    // Handles request validation failures and returns field-level error details
     public ResponseEntity<ApiErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
         Map<String, String> validationErrors = new LinkedHashMap<>();
 
+        // Collects validation errors in field -> message format
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
@@ -61,6 +65,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    // Fallback handler for unexpected server-side errors
     public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex,
             HttpServletRequest request

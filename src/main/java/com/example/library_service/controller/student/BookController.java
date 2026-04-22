@@ -12,10 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/library/books")
 @RequiredArgsConstructor
+// Controller for retrieving available books for students
 public class BookController {
 
     private final BookService bookService;
 
+    // Returns list of all active books in the library
     @GetMapping
     public List<BookResponse> getAllBooks() {
         return bookService.getAllBooks();
