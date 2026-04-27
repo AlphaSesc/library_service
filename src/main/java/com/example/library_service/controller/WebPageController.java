@@ -42,6 +42,12 @@ public class WebPageController {
         return "student/my-borrowings";
     }
 
+    // Student change pin page
+    @GetMapping("/pin-change")
+    public String changePinPage() {
+        return "student/pin-change";
+    }
+
     // Admin dashboard page
     @GetMapping("/admin/dashboard")
     public String adminDashboardPage() {

@@ -1,0 +1,22 @@
+
+spring:
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/library_service_db  # Database URL for library service
+    username:   # DB username
+    password:  # DB password (keep in dev only, not in git)
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # Automatically update schema (dev only, not for production)
+    show-sql: true # Log SQL queries in console
+    properties:
+      hibernate:
+        format_sql: true # Format SQL logs for readability
+
+jwt:
+  secret:  # Secret key for signing JWT tokens
+  expiration: 86400000 # Token validity in milliseconds (1 day)
+
+

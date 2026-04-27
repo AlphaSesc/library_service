@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/library")
 // Controller handling registration of students into the library system
 public class LibraryRegistrationController {
 

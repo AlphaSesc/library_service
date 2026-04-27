@@ -63,6 +63,7 @@ public class SecurityConfig {
                                 "/dashboard",
                                 "/books",
                                 "/borrow-history",
+                                "/pin-change",
                                 "/my-borrowings",
                                 "/admin/dashboard",
                                 "/admin/add-book",

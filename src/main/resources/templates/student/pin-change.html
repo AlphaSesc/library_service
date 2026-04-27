@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Change PIN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Change PIN</h2>
+        <div>
+            <a th:href="@{/dashboard}" class="btn btn-secondary btn-sm me-2">Dashboard</a>
+            <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form id="changePinForm">
+                <div class="mb-3">
+                    <label class="form-label">Old PIN</label>
+                    <input type="password" id="oldPin" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">New PIN</label>
+                    <input type="password" id="newPin" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Change PIN</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    const token = localStorage.getItem("token");
+    const messageBox = document.getElementById("message");
+
+    if (!token) {
+        window.location.href = [[ @{/login} ]];
+    }
+
+    document.getElementById("changePinForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        messageBox.innerHTML = "";
+
+        const data = {
+            oldPin: document.getElementById("oldPin").value,
+            newPin: document.getElementById("newPin").value
+        };
+
+        try {
+            const response = await fetch([[ @{/api/library/auth/change-pin} ]], {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear();
+                window.location.href = [[ @{/login} ]];
+                return;
+            }
+
+            let result = null;
+            const contentType = response.headers.get("content-type");
+
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                result = await response.text();
+            }
+
+            if (!response.ok) {
+                let errorHtml = result?.message
+                    ? `<div>${result.message}</div>`
+                    : `<div>Failed to change PIN.</div>`;
+
+                if (result?.validationErrors) {
+                    for (const field in result.validationErrors) {
+                        errorHtml += `<div>${result.validationErrors[field]}</div>`;
+                    }
+                }
+
+                messageBox.innerHTML = `<div class="alert alert-danger">${errorHtml}</div>`;
+                return;
+            }
+
+            messageBox.innerHTML = `
+                <div class="alert alert-success">
+                    ${result || 'PIN changed successfully'}
+                </div>
+            `;
+
+            document.getElementById("changePinForm").reset();
+
+        } catch (error) {
+            messageBox.innerHTML =
+                `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
+        }
+    });
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = [[ @{/login} ]];
+    }
+</script>
+
+</body>
+</html>
