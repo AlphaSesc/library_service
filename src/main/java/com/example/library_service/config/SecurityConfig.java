@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints accessible without authentication
-                        .requestMatchers("/api/library/auth/**",
+                        .requestMatchers("/api/library/auth/login",
                                 "/login",
                                 "/dashboard",
                                 "/books",

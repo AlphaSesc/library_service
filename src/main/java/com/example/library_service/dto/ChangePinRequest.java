@@ -1,13 +1,14 @@
 package com.example.library_service.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 // Request DTO for updating a user's library PIN
 public class ChangePinRequest {
 
